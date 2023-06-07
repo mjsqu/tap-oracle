@@ -43,3 +43,4 @@ jobs:
         TAP_ORACLE_PORT: 1521
         TAP_ORACLE_PASSWORD: admin
         TAP_ORACLE_USER: SYS
+        TAP_ORACLE_SID: FREEPDB1

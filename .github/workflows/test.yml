@@ -41,7 +41,7 @@ jobs:
       env:
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521
-        TAP_ORACLE_PASSWORD: admin
-        TAP_ORACLE_USER: SYS
+        TAP_ORACLE_USER: scott
+        TAP_ORACLE_PASSWORD: tiger
         TAP_ORACLE_SID: FREEPDB1
         TAP_ORACLE_ALIAS: SYSDBA

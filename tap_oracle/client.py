@@ -31,8 +31,6 @@ f"{config['user']}:{config['password']}"
 f"@{config['host']}:{config['port']}"
 f"?service_name={config['sid']}"
         )
-        if config.get('alias'):
-            connection_string += f" AS {config.get('alias')}"
         return connection_string
 
     @staticmethod

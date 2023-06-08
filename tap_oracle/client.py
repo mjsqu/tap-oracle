@@ -29,7 +29,7 @@ class oracleConnector(SQLConnector):
 f"oracle+oracledb://"
 f"{config['user']}:{config['password']}"
 f"@{config['host']}:{config['port']}"
-f"/{config['sid']}"
+f"?service_name={config['sid']}"
         )
 
     @staticmethod

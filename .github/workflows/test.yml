@@ -44,4 +44,3 @@ jobs:
         TAP_ORACLE_USER: scott
         TAP_ORACLE_PASSWORD: tiger
         TAP_ORACLE_SID: FREEPDB1
-        TAP_ORACLE_ALIAS: SYSDBA

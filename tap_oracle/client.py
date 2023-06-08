@@ -26,7 +26,7 @@ class oracleConnector(SQLConnector):
         """
         # TODO: Replace this with a valid connection string for your source:
         return (
-f"oracle://"
+f"oracle+oracledb://"
 f"{config['user']}:{config['password']}"
 f"@{config['host']}:{config['port']}"
 f"/{config['sid']}"

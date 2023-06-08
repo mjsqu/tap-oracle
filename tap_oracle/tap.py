@@ -48,6 +48,12 @@ class Taporacle(SQLTap):
             required=True,
             description="SID for connection to Oracle",
         ),
+        th.Property(
+            "alias",
+            th.StringType,
+            required=True,
+            description="Alias for connections",
+        ),
     ).to_dict()
     
     @final

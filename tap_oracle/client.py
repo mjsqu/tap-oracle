@@ -25,12 +25,15 @@ class oracleConnector(SQLConnector):
             SQLAlchemy connection string
         """
         # TODO: Replace this with a valid connection string for your source:
-        return (
+        connection_string = (
 f"oracle+oracledb://"
 f"{config['user']}:{config['password']}"
 f"@{config['host']}:{config['port']}"
 f"?service_name={config['sid']}"
         )
+        if config.get('alias'):
+            connection_string += f" {config.get('alias')}"
+        return connection_string
 
     @staticmethod
     def to_jsonschema_type(

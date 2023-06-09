@@ -3,7 +3,7 @@
 
 name: Test tap-oracle
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
   pytest:

@@ -43,20 +43,23 @@ class Taporacle(SQLTap):
             description="Password for connection to Oracle",
         ),
         th.Property(
-            "sid",
+            "dbname",
             th.StringType,
-            description="SID for connection to Oracle, specify one of service_name/sid",
+            description="Dbname for connection to Oracle (optional)",
         ),
         th.Property(
             "service_name",
             th.StringType,
-            description="Service Name for connection to Oracle, specify one of service_name/sid",
+            description="Service Name for connection to Oracle (optional)",
         ),
     ).to_dict()
     
     @final
     def sync_all(self) -> None:
-        """Sync all streams."""
+        """Sync all streams.
+        
+        Subclassed in this tap to move "Skipping deselected stream" messages to debug
+        """
         self._reset_state_progress_markers()
         self._set_compatible_replication_methods()
         stream: Stream

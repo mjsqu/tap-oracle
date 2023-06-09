@@ -1,5 +1,8 @@
 # Secrets and internal config files
 **/.secrets/*
+config.json
+state.json
+catalog.json
 
 # Ignore meltano internal cache and sqlite systemdb
 

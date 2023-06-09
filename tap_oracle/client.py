@@ -29,16 +29,51 @@ class oracleConnector(SQLConnector):
         Returns:
             A new SQLAlchemy Engine.
         """
-        return sqlalchemy.create_engine(
-    f'oracle+oracledb://:@',
-        thick_mode=False,
-        connect_args={
-            "user": self.config['user'],
-            "password": self.config['password'],
-            "host": self.config['host'],
-            "port": self.config.get('port',1521),
-            "service_name": self.config.get('service_name')
-    })
+        """
+        oracle+oracledb://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]
+        """
+        connection_string = (
+            f"""oracle+oracledb://"""
+            f"""{self.config["user"]}:{self.config["password"]}"""
+            f"""@"""
+            f"""{self.config["host"]}:{self.config["port"]}"""
+        )
+        
+        if self.config.get('dbname'):
+            connection_string += f"""/{self.config["dbname"]}"""
+        if self.config.get('service_name'):
+            connection_string += f"""?service_name={self.config["service_name"]}"""
+
+        return sqlalchemy.create_engine(connection_string)
+
+    def discover_catalog_entries(self) -> list[dict]:
+        """Return a list of catalog entries from discovery.
+
+        Returns:
+            The discovered catalog entries as a list.
+        """
+        result: list[dict] = []
+        engine = self._engine
+        inspected = sqlalchemy.inspect(engine)
+        for schema_name in self.get_schema_names(engine, inspected):
+            if schema_name.lower() != 'sys':
+                continue
+            # Iterate through each table and view
+            for table_name, is_view in self.get_object_names(
+                engine,
+                inspected,
+                schema_name,
+            ):
+                catalog_entry = self.discover_catalog_entry(
+                    engine,
+                    inspected,
+                    schema_name,
+                    table_name,
+                    is_view,
+                )
+                result.append(catalog_entry.to_dict())
+
+        return result
 
     @staticmethod
     def to_jsonschema_type(

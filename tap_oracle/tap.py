@@ -45,8 +45,12 @@ class Taporacle(SQLTap):
         th.Property(
             "sid",
             th.StringType,
-            required=True,
-            description="SID for connection to Oracle",
+            description="SID for connection to Oracle, specify one of service_name/sid",
+        ),
+        th.Property(
+            "service_name",
+            th.StringType,
+            description="Service Name for connection to Oracle, specify one of service_name/sid",
         ),
     ).to_dict()
     

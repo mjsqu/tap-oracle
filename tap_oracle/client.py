@@ -15,23 +15,30 @@ from singer_sdk import SQLConnector, SQLStream
 class oracleConnector(SQLConnector):
     """Connects to the oracle SQL source."""
 
-    def get_sqlalchemy_url(self, config: dict) -> str:
-        """Concatenate a SQLAlchemy URL for use in connecting to the source.
+    def create_engine(self) -> Engine:
+        """Creates and returns a new engine. Do not call outside of _engine.
 
-        Args:
-            config: A dict with connection parameters
+        NOTE: Do not call this method. The only place that this method should
+        be called is inside the self._engine method. If you'd like to access
+        the engine on a connector, use self._engine.
+
+        This method exists solely so that tap/target developers can override it
+        on their subclass of SQLConnector to perform custom engine creation
+        logic.
 
         Returns:
-            SQLAlchemy connection string
+            A new SQLAlchemy Engine.
         """
-        # TODO: Replace this with a valid connection string for your source:
-        connection_string = (
-f"oracle+oracledb://"
-f"{config['user']}:{config['password']}"
-f"@{config['host']}:{config['port']}"
-f"?service_name={config['sid']}"
-        )
-        return connection_string
+        return sqlalchemy.create_engine(
+    f'oracle+oracledb://:@',
+        thick_mode=False,
+        connect_args={
+            "user": config['user'],
+            "password": config['password'],
+            "host": config['host'],
+            "port": config.get('port',1521),
+            "service_name": config.get('service_name')
+    })
 
     @staticmethod
     def to_jsonschema_type(

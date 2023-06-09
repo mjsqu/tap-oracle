@@ -33,11 +33,11 @@ class oracleConnector(SQLConnector):
     f'oracle+oracledb://:@',
         thick_mode=False,
         connect_args={
-            "user": config['user'],
-            "password": config['password'],
-            "host": config['host'],
-            "port": config.get('port',1521),
-            "service_name": config.get('service_name')
+            "user": self.config['user'],
+            "password": self.config['password'],
+            "host": self.config['host'],
+            "port": self.config.get('port',1521),
+            "service_name": self.config.get('service_name')
     })
 
     @staticmethod

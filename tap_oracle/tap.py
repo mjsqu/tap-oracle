@@ -52,6 +52,11 @@ class Taporacle(SQLTap):
             th.StringType,
             description="Service Name for connection to Oracle (optional)",
         ),
+        th.Property(
+            "filter_schemas",
+            th.ArrayType(th.StringType),
+            description="Service Name for connection to Oracle (optional)",
+        ),
     ).to_dict()
     
     @final

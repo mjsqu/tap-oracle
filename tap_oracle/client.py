@@ -55,8 +55,15 @@ class oracleConnector(SQLConnector):
         result: list[dict] = []
         engine = self._engine
         inspected = sqlalchemy.inspect(engine)
-        for schema_name in self.get_schema_names(engine, inspected):
-            if schema_name.lower() != 'sys':
+        
+        # Get the filter_schema config parameter if set
+        if self.config.get('filter_schemas'):
+            schema_list = self.config.get('filter_schemas')
+        else:
+            schema_list = self.get_schema_names(engine, inspected)
+
+        for schema_name in schema_list:
+            if schema_name.lower() == 'sys':
                 continue
             # Iterate through each table and view
             for table_name, is_view in self.get_object_names(
@@ -64,6 +71,7 @@ class oracleConnector(SQLConnector):
                 inspected,
                 schema_name,
             ):
+                self.logger.info(f"{schema_name}.{table_name} {is_view=}")
                 catalog_entry = self.discover_catalog_entry(
                     engine,
                     inspected,

@@ -36,7 +36,7 @@ jobs:
         poetry install
     - name: Run discover
       run: |
-        poetry run tap-oracle --discover
+        poetry run tap-oracle --discover --config=ENV
       env:
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521

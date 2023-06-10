@@ -71,7 +71,7 @@ class oracleConnector(SQLConnector):
                 inspected,
                 schema_name,
             ):
-                self.logger.info(f"{schema_name}.{table_name} {is_view=}")
+                self.logger.info(f"{schema_name}.{table_name} is_view={is_view}")
                 catalog_entry = self.discover_catalog_entry(
                     engine,
                     inspected,

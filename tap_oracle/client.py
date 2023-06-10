@@ -58,7 +58,7 @@ class oracleConnector(SQLConnector):
         
         # Get the filter_schema config parameter if set
         if self.config.get('filter_schemas'):
-            schema_list = self.config.get('filter_schemas')
+            schema_list = self.config.get('filter_schemas').split(',')
         else:
             schema_list = self.get_schema_names(engine, inspected)
 

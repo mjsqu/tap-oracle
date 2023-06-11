@@ -20,7 +20,7 @@ connector = oracleConnector(SAMPLE_CONFIG)
 engine = connector.create_engine()
 
 def setup_hr_user(con):
-    con.execute(text('DROP USER hr CASCADE'))
+    #con.execute(text('DROP USER hr CASCADE'))
     query = f"""CREATE USER hr IDENTIFIED BY {os.getenv('TAP_ORACLE_PASSWORD')}
                 DEFAULT TABLESPACE USERS
                 QUOTA UNLIMITED ON USERS"""

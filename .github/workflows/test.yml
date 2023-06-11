@@ -27,6 +27,7 @@ jobs:
     - name: Get Oracle Sample Database Scripts
       uses: actions/checkout@master
       with:
+        path: oracle-samples
         repository: oracle-samples/db-sample-schemas
         ref: v23.1
     - uses: actions/checkout@v3

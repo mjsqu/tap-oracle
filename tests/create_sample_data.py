@@ -19,6 +19,8 @@ SAMPLE_CONFIG = {
 connector = oracleConnector(SAMPLE_CONFIG)
 engine = connector.create_engine()
 
+sample_repo_path = f"os.getenv('GITHUB_WORKSPACE')/oracle-samples/oracle-samples/db-sample-schemas"
+
 def setup_hr_user(con):
     #con.execute(text('DROP USER hr CASCADE'))
     query = f"""CREATE USER hr IDENTIFIED BY {os.getenv('TAP_ORACLE_PASSWORD')}
@@ -40,7 +42,7 @@ def setup_hr_user(con):
 with engine.connect() as con:
     setup_hr_user(con)
     con.execute(text("""ALTER SESSION SET CURRENT_SCHEMA=HR"""))
-    with open('../db-sample-schemas/human_resources/hr_create.sql','r') as f:
+    with open(f"{sample_repo_path}/human_resources/hr_create.sql",'r') as f:
         clean_statements = re.sub(r'(?mi)^(rem|prompt|set).*\n?','',f.read())
         # Extra clean up required for semicolons in strings
         # This looks for a semicolon followed by a non-newline space, followed by a non-newline
@@ -51,7 +53,9 @@ with engine.connect() as con:
         if stmt.strip() != '':
             con.execute(text(stmt))
 
-    with open('../db-sample-schemas/human_resources/hr_populate.sql','r') as f:
+    with open(
+        f"{sample_repo_path}/human_resources/hr_populate.sql"
+    ,'r') as f:
         # For this file, grab anything between BEGIN/END;
         pattern = re.compile(r'(?s)(BEGIN.*?END;|ALTER TABLE.*?dept_mgr_fk)')
         for statement in re.findall(pattern, f.read()):

@@ -24,7 +24,8 @@ jobs:
           - 1521:1521
 
     steps:
-    - uses: actions/checkout@master
+    - name: Get Oracle Sample Database Scripts
+      uses: actions/checkout@master
       with:
         name: oracle-samples/db-sample-schemas
         ref: v23.1

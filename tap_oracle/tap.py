@@ -54,8 +54,10 @@ class Taporacle(SQLTap):
         ),
         th.Property(
             "filter_schemas",
-            th.ArrayType(th.StringType),
-            description="Service Name for connection to Oracle (optional)",
+            # TODO: Set back to ArrayType when Meltano supports complex env vars
+            #th.ArrayType(th.StringType),
+            th.StringType,
+            description="Provide a comma delimited list of schemas to filter on",
         ),
     ).to_dict()
     

@@ -58,7 +58,7 @@ class oracleConnector(SQLConnector):
         
         # Get the filter_schema config parameter if set
         if self.config.get('filter_schemas'):
-            schema_list = self.config.get('filter_schemas')
+            schema_list = self.config.get('filter_schemas').split(',')
         else:
             schema_list = self.get_schema_names(engine, inspected)
 
@@ -71,7 +71,7 @@ class oracleConnector(SQLConnector):
                 inspected,
                 schema_name,
             ):
-                self.logger.info(f"{schema_name}.{table_name} {is_view=}")
+                self.logger.info(f"{schema_name}.{table_name} is_view={is_view}")
                 catalog_entry = self.discover_catalog_entry(
                     engine,
                     inspected,

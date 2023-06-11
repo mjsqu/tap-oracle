@@ -27,7 +27,7 @@ jobs:
     - name: Get Oracle Sample Database Scripts
       uses: actions/checkout@master
       with:
-        name: oracle-samples/db-sample-schemas
+        repository: oracle-samples/db-sample-schemas
         ref: v23.1
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}

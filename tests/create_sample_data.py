@@ -19,7 +19,7 @@ SAMPLE_CONFIG = {
 connector = oracleConnector(SAMPLE_CONFIG)
 engine = connector.create_engine()
 
-sample_repo_path = f"{os.getenv('GITHUB_WORKSPACE')}/oracle-samples/db-sample-schemas"
+sample_repo_path = f"{os.getenv('GITHUB_WORKSPACE')}/oracle-samples"
 
 def setup_hr_user(con):
     #con.execute(text('DROP USER hr CASCADE'))

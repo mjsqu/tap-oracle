@@ -31,6 +31,8 @@ jobs:
         repository: oracle-samples/db-sample-schemas
         ref: v23.1
     - uses: actions/checkout@v3
+      with:
+        path: main
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -40,12 +42,15 @@ jobs:
         find ${GITHUB_WORKSPACE} 2>/dev/null
     - name: Install Poetry
       run: |
+        cd ${GITHUB_WORKSPACE}/main
         pip install poetry
     - name: Install dependencies
       run: |
+        cd ${GITHUB_WORKSPACE}/main
         poetry install
     - name: Create sample HR data
       run: |
+        cd ${GITHUB_WORKSPACE}/main
         poetry run python tests/create_sample_data.py
       env:
         GITHUB_WORKSPACE: ${{ env.GITHUB_WORKSPACE }}

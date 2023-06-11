@@ -47,7 +47,7 @@ with engine.connect() as con:
         clean_statements = re.sub(r";([^\S\r\n][^\n])",r'\1',clean_statements)
 
     for stmt in clean_statements.split(';'):
-        print(f"{stmt=}")
+        print(f"{stmt}")
         if stmt.strip() != '':
             con.execute(text(stmt))
 

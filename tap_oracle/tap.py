@@ -24,9 +24,9 @@ class Taporacle(SQLTap):
         ),
         th.Property(
             "port",
-            th.StringType,
+            th.IntegerType,
             required=True,
-            default="1521",
+            default=1521,
             description="Port for connection to Oracle",
         ),
         th.Property(

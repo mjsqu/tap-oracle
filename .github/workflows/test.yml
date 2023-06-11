@@ -3,7 +3,7 @@
 
 name: Test tap-oracle
 
-on: [workflow_dispatch]
+on: [push]
 
 jobs:
   pytest:
@@ -24,6 +24,10 @@ jobs:
           - 1521:1521
 
     steps:
+    - uses: actions/checkout@master
+      with:
+        name: oracle-samples/db-sample-schemas
+        ref: v23.1
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -35,9 +39,9 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
-    - name: Test with pytest
+    - name: Create sample HR data
       run: |
-        poetry run pytest
+        poetry run python tests/create_sample_data.py
       env:
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521

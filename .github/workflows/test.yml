@@ -45,6 +45,7 @@ jobs:
       run: |
         poetry run python tests/create_sample_data.py
       env:
+        GITHUB_WORKSPACE: ${{ env.GITHUB_WORKSPACE }}
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521
         TAP_ORACLE_USER: SYSTEM

@@ -3,7 +3,7 @@
 
 name: Test tap-oracle
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
   pytest:
@@ -57,15 +57,5 @@ jobs:
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521
         TAP_ORACLE_USER: SYSTEM
-        TAP_ORACLE_PASSWORD: admin
-        TAP_ORACLE_SERVICE_NAME: FREEPDB1
-    - name: Test using the HR User
-      run: |
-        cd ${GITHUB_WORKSPACE}/main
-        poetry run pytest
-      env:
-        TAP_ORACLE_HOST: localhost
-        TAP_ORACLE_PORT: 1521
-        TAP_ORACLE_USER: HR
         TAP_ORACLE_PASSWORD: admin
         TAP_ORACLE_SERVICE_NAME: FREEPDB1

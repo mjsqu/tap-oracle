@@ -61,6 +61,7 @@ jobs:
         TAP_ORACLE_SERVICE_NAME: FREEPDB1
     - name: Test using the HR User
       run: |
+        cd ${GITHUB_WORKSPACE}/main
         poetry run pytest
       env:
         TAP_ORACLE_HOST: localhost

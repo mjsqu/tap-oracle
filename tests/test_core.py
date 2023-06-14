@@ -16,14 +16,8 @@ SAMPLE_CONFIG = {
     "service_name":os.getenv('TAP_ORACLE_SERVICE_NAME'),
 }
 
-# Get a SQLAlchemy engine and run get_schema_names
-connector = oracleConnector(SAMPLE_CONFIG)
-engine = connector.create_engine()
-inspected = sqlalchemy.inspect(engine)
-print(list(inspected.get_schema_names()))
-
 # Run standard built-in tap tests from the SDK:
-#TestTaporacle = get_tap_test_class(
-#    tap_class=Taporacle,
-#    config=SAMPLE_CONFIG,
-#)
+TestTaporacle = get_tap_test_class(
+    tap_class=Taporacle,
+    config=SAMPLE_CONFIG,
+)

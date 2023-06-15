@@ -9,7 +9,11 @@ import typing as t
 from typing import Any, Iterable
 
 import sqlalchemy  # noqa: TCH002
+import singer_sdk._singerlib as singer
+
 from singer_sdk import SQLConnector, SQLStream
+from singer_sdk.helpers._catalog import pop_deselected_record_properties
+from singer_sdk.helpers._util import utc_now
 
 
 class oracleConnector(SQLConnector):
@@ -163,20 +167,101 @@ class oracleStream(SQLStream):
 
         return self._cached_schema
 
-    def get_records(self, partition: dict | None) -> Iterable[dict[str, Any]]:
+    # Get records from stream
+    def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
         """Return a generator of record-type dictionary objects.
 
-        Developers may optionally add custom logic before calling the default
-        implementation inherited from the base class.
+        If the stream has a replication_key value defined, records will be sorted by the
+        incremental key. If the stream also has an available starting bookmark, the
+        records will be filtered for values greater than or equal to the bookmark value.
 
         Args:
-            partition: If provided, will read specifically from this data slice.
+            context: If partition context is provided, will read specifically from this
+                data slice.
 
         Yields:
             One dict per record.
+
+        Raises:
+            NotImplementedError: If partition is passed in context and the stream does
+                not support partitioning.
         """
-        # Optionally, add custom logic instead of calling the super().
-        # This is helpful if the source database provides batch-optimized record
-        # retrieval.
-        # If no overrides or optimizations are needed, you may delete this method.
-        yield from super().get_records(partition)
+        if not self.config.get('cursor_array_size'):
+            yield from super().get_records(context)
+        
+        else:
+            cursor_array_size = int(self.config.get('cursor_array_size'))
+            self.logger.info(f"Cursor Array Size for fetchmany() calls = {cursor_array_size}")
+            if context:
+                msg = f"Stream '{self.name}' does not support partitioning."
+                raise NotImplementedError(msg)
+
+            selected_column_names = self.get_selected_schema()["properties"].keys()
+            table = self.connector.get_table(
+                full_table_name=self.fully_qualified_name,
+                column_names=selected_column_names,
+            )
+            query = table.select()
+    
+            if self.replication_key:
+                replication_key_col = table.columns[self.replication_key]
+                query = query.order_by(replication_key_col)
+    
+                start_val = self.get_starting_replication_key_value(context)
+                if start_val:
+                    query = query.where(
+                        sqlalchemy.text(":replication_key >= :start_val").bindparams(
+                            replication_key=replication_key_col,
+                            start_val=start_val,
+                            ),
+                    )
+
+            if self.ABORT_AT_RECORD_COUNT is not None:
+                # Limit record count to one greater than the abort threshold. This ensures
+                # `MaxRecordsLimitException` exception is properly raised by caller
+                # `Stream._sync_records()` if more records are available than can be
+                # processed.
+                query = query.limit(self.ABORT_AT_RECORD_COUNT + 1)
+
+            with self.connector._connect() as conn:
+                proxy = conn.execute(query)
+          
+                while True:
+                    batch = proxy.fetchmany(cursor_array_size)
+            
+                    if not batch:
+                        break
+            
+                    for record in batch:
+                        transformed_record = self.post_process(dict(record._mapping))
+                        if transformed_record is None:
+                            # Record filtered out during post_process()
+                            continue
+                        yield transformed_record
+        
+    def _generate_record_messages(
+        self,
+        record: dict,
+    ) -> t.Generator[singer.RecordMessage, None, None]:
+        """Write out a RECORD message.
+
+        Args:
+            record: A single stream record.
+
+        Yields:
+            Record message objects.
+        """
+        pop_deselected_record_properties(record, self.schema, self.mask, self.logger)
+
+        for stream_map in self.stream_maps:
+            mapped_record = stream_map.transform(record)
+            # Emit record if not filtered
+            if mapped_record is not None:
+                record_message = singer.RecordMessage(
+                    stream=stream_map.stream_alias,
+                    record=mapped_record,
+                    version=None,
+                    time_extracted=utc_now(),
+                )
+
+                yield record_message

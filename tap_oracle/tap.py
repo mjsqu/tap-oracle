@@ -60,10 +60,9 @@ class Taporacle(SQLTap):
             description="Provide a comma delimited list of schemas to filter on",
         ),
         th.Property(
-            "driver",
+            "cursor_array_size",
             th.StringType,
-            description="Oracle Driver for SQLAlchemy connection string",
-            allowed_values=["cx_oracle", "oracledb"]
+            description="Cursor Array Size for fetchmany() calls"
         ),
     ).to_dict()
     

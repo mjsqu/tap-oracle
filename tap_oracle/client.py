@@ -34,7 +34,7 @@ class oracleConnector(SQLConnector):
         oracle+oracledb://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]
         """
         connection_string = (
-            f"""oracle+{self.config.get('driver','oracledb')}://"""
+            f"""oracle+oracledb://"""
             f"""{self.config["user"]}:{self.config["password"]}"""
             f"""@"""
             f"""{self.config["host"]}:{self.config["port"]}"""
@@ -44,8 +44,16 @@ class oracleConnector(SQLConnector):
             connection_string += f"""/{self.config["dbname"]}"""
         if self.config.get('service_name'):
             connection_string += f"""?service_name={self.config["service_name"]}"""
+            
+        try:
+            engine = sqlalchemy.create_engine(connection_string)
+            engine.connect()
+        except:
+            self.logger.info("Falling back to thick mode")
+            engine = sqlalchemy.create_engine(connection_string,thick_mode=True)
+            engine.connect()
 
-        return sqlalchemy.create_engine(connection_string)
+        return engine
 
     def discover_catalog_entries(self) -> list[dict]:
         """Return a list of catalog entries from discovery.
@@ -62,8 +70,8 @@ class oracleConnector(SQLConnector):
         if self.config.get('filter_schemas'):
             sys_selected = 'sys' in [schema.lower() for schema in self.config.get('filter_schemas').split(',')]
             schema_list = list(
-                    set(self.config.get('filter_schemas').split(',')) & 
-                    set(self.get_schema_names(engine, inspected))
+                    set([schema.lower() for schema in self.config.get('filter_schemas').split(',')]) & 
+                    set([schema.lower() for schema in self.get_schema_names(engine, inspected)])
                 )
         else:
             schema_list = self.get_schema_names(engine, inspected)

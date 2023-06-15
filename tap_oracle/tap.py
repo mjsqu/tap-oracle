@@ -59,6 +59,12 @@ class Taporacle(SQLTap):
             th.StringType,
             description="Provide a comma delimited list of schemas to filter on",
         ),
+        th.Property(
+            "driver",
+            th.StringType,
+            description="Oracle Driver for SQLAlchemy connection string",
+            allowed_values=["cx_oracle", "oracledb"]
+        ),
     ).to_dict()
     
     @final

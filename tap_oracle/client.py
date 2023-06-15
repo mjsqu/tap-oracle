@@ -30,10 +30,11 @@ class oracleConnector(SQLConnector):
             A new SQLAlchemy Engine.
         """
         """
+        oracle+cx_oracle://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]
         oracle+oracledb://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]
         """
         connection_string = (
-            f"""oracle+oracledb://"""
+            f"""oracle+{self.config.get('driver','oracledb')}://"""
             f"""{self.config["user"]}:{self.config["password"]}"""
             f"""@"""
             f"""{self.config["host"]}:{self.config["port"]}"""
@@ -55,15 +56,23 @@ class oracleConnector(SQLConnector):
         result: list[dict] = []
         engine = self._engine
         inspected = sqlalchemy.inspect(engine)
+        sys_selected = False
         
         # Get the filter_schema config parameter if set
         if self.config.get('filter_schemas'):
-            schema_list = self.config.get('filter_schemas').split(',')
+            sys_selected = 'sys' in [schema.lower() for schema in self.config.get('filter_schemas').split(',')]
+            schema_list = list(
+                    set(self.config.get('filter_schemas').split(',')) & 
+                    set(self.get_schema_names(engine, inspected))
+                )
         else:
             schema_list = self.get_schema_names(engine, inspected)
 
         for schema_name in schema_list:
-            if schema_name.lower() == 'sys':
+            if (schema_name.lower() == 'sys'
+                and 
+                # If sys is explicitly selected then do not skip
+                not sys_selected):
                 continue
             # Iterate through each table and view
             for table_name, is_view in self.get_object_names(

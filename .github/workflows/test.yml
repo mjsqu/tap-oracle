@@ -59,14 +59,14 @@ jobs:
         TAP_ORACLE_USER: SYSTEM
         TAP_ORACLE_PASSWORD: admin
         TAP_ORACLE_SERVICE_NAME: FREEPDB1
-    - name: Create sample HR data
+    - name: Run pytest
       run: |
         cd ${GITHUB_WORKSPACE}/main
-        poetry run tap-oracle --config=ENV --discover
+        poetry run pytest
       env:
         TAP_ORACLE_HOST: localhost
         TAP_ORACLE_PORT: 1521
         TAP_ORACLE_USER: HR
         TAP_ORACLE_PASSWORD: admin
         TAP_ORACLE_SERVICE_NAME: FREEPDB1
-        TAP_ORACLE_DRIVER: cx_oracle
+        TAP_ORACLE_FILTER_SCHEMAS: HR

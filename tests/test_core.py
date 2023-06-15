@@ -14,10 +14,13 @@ SAMPLE_CONFIG = {
     "user":os.getenv('TAP_ORACLE_USER'),
     "password":os.getenv('TAP_ORACLE_PASSWORD'),
     "service_name":os.getenv('TAP_ORACLE_SERVICE_NAME'),
+    "filter_schemas":os.getenv('TAP_ORACLE_FILTER_SCHEMAS'),
 }
 
-# Run standard built-in tap tests from the SDK:
+my_custom_tap_tests = TestSuite(
+    kind="tap", tests=[TapDiscoveryTest]
+)
+
 TestTaporacle = get_tap_test_class(
-    tap_class=Taporacle,
-    config=SAMPLE_CONFIG,
+    tap_class=Taporacle, config=SAMPLE_CONFIG, custom_suites=my_custom_tap_tests
 )

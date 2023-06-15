@@ -3,7 +3,7 @@
 
 name: Test tap-oracle
 
-on:
+on: [push]
 
 jobs:
   pytest:
@@ -69,3 +69,4 @@ jobs:
         TAP_ORACLE_USER: HR
         TAP_ORACLE_PASSWORD: admin
         TAP_ORACLE_SERVICE_NAME: FREEPDB1
+        TAP_ORACLE_DRIVER: cx_oracle

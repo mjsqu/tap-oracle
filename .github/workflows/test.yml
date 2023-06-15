@@ -20,11 +20,7 @@ jobs:
         #image: container-registry.oracle.com/database/free:23.2.0.0
         # Docker Hub image (feel free to change the tag "latest" to any other available one)
         image: gvenzl/oracle-free:faststart
-
-        # Forward Oracle port
-        ports:
-          - 1521:1521
-
+        
         # Provide healthcheck script options for startup
         options: >-
           --health-cmd healthcheck.sh

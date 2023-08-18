@@ -14,10 +14,11 @@ class Taporacle(SQLTap):
 
     name = "tap-oracle"
     default_stream_class = oracleStream
+    """oracle+oracledb://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]"""
 
     config_jsonschema = th.PropertiesList(
         th.Property(
-            "host",
+            "hostname",
             th.StringType,
             required=True,
             description="The hostname for connection to Oracle",
@@ -37,16 +38,22 @@ class Taporacle(SQLTap):
             description="User account to connect",
         ),
         th.Property(
-            "password",
+            "pass",
             th.StringType,
             secret=True,  # Flag config as protected.
             description="Password for connection to Oracle",
         ),
         th.Property(
-            "sid",
+            "dbname",
             th.StringType,
-            required=True,
-            description="SID for connection to Oracle",
+            required=False,
+            description="Database Name for connection to Oracle",
+        ),
+        th.Property(
+            "service",
+            th.StringType,
+            required=False,
+            description="Service Name"
         ),
     ).to_dict()
     

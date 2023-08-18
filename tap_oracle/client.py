@@ -24,53 +24,43 @@ class oracleConnector(SQLConnector):
         Returns:
             SQLAlchemy connection string
         """
-        # TODO: Replace this with a valid connection string for your source:
-        return (
-f"oracle://"
-f"{config['user']}:{config['password']}"
-f"@{config['host']}:{config['port']}"
-f"/{config['sid']}"
+        # oracle+oracledb://user:pass@hostname:port[/dbname][?service_name=<service>[&key=value&key=value...]]
+        protocol = "oracle+oracledb"
+        sqlalchemy_url = (
+                f"{protocol}"
+                f"://"
+                f"{config['user']}:{config['pass']}"
+                f"@"
+                f"{config['hostname']}:{config['port']}"
+                )
+        options = ""
+        if config.get('dbname'):
+            options += f"/{config['dbname']}"
+        if config.get('service_name'):
+            options += f"?service_name={config['service_name']}"
+        if config['user'] == 'SYS':
+            options += f"&mode=SYSDBA"
+
+        return sqlalchemy_url+options
+
+    def create_engine(self) -> Engine:
+        """Creates and returns a new engine. Do not call outside of _engine.
+
+        NOTE: Do not call this method. The only place that this method should
+        be called is inside the self._engine method. If you'd like to access
+        the engine on a connector, use self._engine.
+
+        This method exists solely so that tap/target developers can override it
+        on their subclass of SQLConnector to perform custom engine creation
+        logic.
+
+        Returns:
+            A new SQLAlchemy Engine.
+        """
+        return sqlalchemy.create_engine(
+            self.sqlalchemy_url,
+            echo=False,
         )
-
-    @staticmethod
-    def to_jsonschema_type(
-        from_type: str
-        | sqlalchemy.types.TypeEngine
-        | type[sqlalchemy.types.TypeEngine],
-    ) -> dict:
-        """Returns a JSON Schema equivalent for the given SQL type.
-
-        Developers may optionally add custom logic before calling the default
-        implementation inherited from the base class.
-
-        Args:
-            from_type: The SQL type as a string or as a TypeEngine. If a TypeEngine is
-                provided, it may be provided as a class or a specific object instance.
-
-        Returns:
-            A compatible JSON Schema type definition.
-        """
-        # Optionally, add custom logic before calling the parent SQLConnector method.
-        # You may delete this method if overrides are not needed.
-        return SQLConnector.to_jsonschema_type(from_type)
-
-    @staticmethod
-    def to_sql_type(jsonschema_type: dict) -> sqlalchemy.types.TypeEngine:
-        """Returns a JSON Schema equivalent for the given SQL type.
-
-        Developers may optionally add custom logic before calling the default
-        implementation inherited from the base class.
-
-        Args:
-            jsonschema_type: A dict
-
-        Returns:
-            SQLAlchemy type
-        """
-        # Optionally, add custom logic before calling the parent SQLConnector method.
-        # You may delete this method if overrides are not needed.
-        return SQLConnector.to_sql_type(jsonschema_type)
-
 
 class oracleStream(SQLStream):
     """Stream class for oracle streams."""
@@ -78,7 +68,7 @@ class oracleStream(SQLStream):
     connector_class = oracleConnector
     _cached_schema: dict | None = None
     
-    @property  # TODO: Investigate @cached_property after py > 3.7
+    @property  # TODO: Investigate @cached_property after py > 3
     def schema(self) -> dict:
         """Return metadata object (dict) as specified in the Singer spec.
 
